@@ -4,6 +4,10 @@ import 'package:flutterclonethecoffeehouse/src/bloc/product_detail/product_detai
 import 'package:flutterclonethecoffeehouse/src/bloc/product_detail/product_detail_state.dart';
 
 class ProductDetailBloc extends BlocBase<BaseEvent, ProductDetailState> {
+  final Size size;
+
+  ProductDetailBloc({this.size});
+
   @override
   ProductDetailState get initialState => ProductDetailState(quantity: 1);
 
@@ -34,8 +38,7 @@ class ProductDetailBloc extends BlocBase<BaseEvent, ProductDetailState> {
     yield ProductDetailState(quantity: state.quantity);
   }
 
-  Stream<ProductDetailState> _chooseSizeProductState(
-      ChooseSizeProductEvent event) async* {
+  Stream<ProductDetailState> _chooseSizeProductState(ChooseSizeProductEvent event) async* {
     yield ProductDetailState();
 
     yield ProductDetailState();
@@ -59,13 +62,25 @@ class ProductDetailBloc extends BlocBase<BaseEvent, ProductDetailState> {
     }
   }
 
-//  chooseSize(int sizeCost) {
-//    switch(state.size){
-//      case {}
-//    }
-//  }
+  chooseSize(int sizeCost) {
+    switch (size) {
+      case Size.LARGE:
+        sizeCost = 10000;
+        state.isActive = true;
+        break;
+      case Size.MEDIUM:
+        sizeCost = 5000;
+        break;
+      case Size.SMALL:
+        sizeCost = 0;
+        break;
+    }
+    return sizeCost;
+  }
 
-  chooseTopping() {
-    add(ChooseToppingProductEvent());
+  chooseTopping(int toppingCost) {}
+
+  totalCost(int sizeCost, int toppingCost, int quantity, productCost) {
+    return (productCost * quantity) + sizeCost + toppingCost;
   }
 }

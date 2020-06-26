@@ -158,7 +158,6 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
             Container(
               child: Column(
                 children: <Widget>[
-//
                   buildChooseSize("Lớn", "+ 10000đ", 1),
                   Divider(
                     height: 1,
@@ -243,7 +242,8 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
                   iconSize: 30,
                   icon: Icon(
                     Icons.remove_circle,
-                    color: noProduct == false ? MyColors.red : MyColors.grey,
+                    color:
+                        (quantity > 1 == true) ? MyColors.red : MyColors.grey,
                   ),
                   onPressed: () {
                     _handleDecrement();

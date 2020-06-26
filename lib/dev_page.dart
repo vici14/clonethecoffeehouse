@@ -20,10 +20,10 @@ class _DevPageState extends State<DevPage> {
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: <Widget>[
-          ItemDevPage(
-            title: 'News Page',
-            routeName: RouteName.newsPage,
-          ),
+//          ItemDevPage(
+//            title: 'News Page',
+//            routeName: RouteName.newsPage,
+//          ),
           ItemDevPage(
             title: 'My Profile Page',
             routeName: RouteName.myProfilePage,
