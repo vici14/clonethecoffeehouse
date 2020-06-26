@@ -2,26 +2,24 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutterclonethecoffeehouse/src/bloc/base/base_event.dart';
-import 'package:flutterclonethecoffeehouse/src/bloc/base/base_state.dart';
 import 'package:flutterclonethecoffeehouse/src/bloc/base/bloc_base.dart';
-import 'package:flutterclonethecoffeehouse/src/data/repository/models/entities.dart';
-import 'package:flutterclonethecoffeehouse/src/data/repository/models/product_repository.dart';
-import 'package:flutterclonethecoffeehouse/src/data/repository/products_repository.dart';
+import 'package:flutterclonethecoffeehouse/src/data/models/entities.dart';
+import 'package:flutterclonethecoffeehouse/src/domain/services/product/product_service.dart';
+import 'package:flutterclonethecoffeehouse/src/domain/services/product/product_service_impl.dart';
 import 'package:flutterclonethecoffeehouse/src/modules/order/bloc/catalog_event.dart';
 import 'package:flutterclonethecoffeehouse/src/modules/order/bloc/catalog_state.dart';
 
-class CatalogBloc extends BlocBase<BaseEvent, BaseState> {
-  final ProductsRepository _productsRepository;
+class CatalogBloc extends BlocBase<BaseEvent, CatalogState> {
+  final ProductService _service = ProductServiceImpl();
   final CatalogTypes type;
 
-  CatalogBloc({@required ProductsRepository productsRepository, this.type})
-      : assert(productsRepository != null),
-        _productsRepository = productsRepository;
+  CatalogBloc({this.type});
 
   @override
   CatalogState get initialState => CatalogState(isLoading: true);
+
   @override
-  Stream<BaseState> mapEventToState(BaseEvent event) async* {
+  Stream<CatalogState> mapEventToState(BaseEvent event) async* {
     if (event is GetCatalogEvent) {
       yield* _getProductsState(event);
     }
@@ -30,10 +28,7 @@ class CatalogBloc extends BlocBase<BaseEvent, BaseState> {
   Stream<CatalogState> _getProductsState(GetCatalogEvent event) async* {
     yield CatalogState(state: state, isLoading: true);
     var _products = await _getProducts();
-    yield CatalogState(
-        state: state,
-        isLoading: false,
-        products: _products.map(ProductResponseRepository.fromEntity).toList());
+    yield CatalogState(state: state, isLoading: false, products: _products);
   }
 
   Future<List<ProductEntity>> _getProducts() async {
@@ -56,7 +51,7 @@ class CatalogBloc extends BlocBase<BaseEvent, BaseState> {
         break;
     }
     try {
-      return await _productsRepository?.getProducts(_filter);
+      return await _service?.getProducts(_filter);
     } catch (ex) {
       debugPrint('getProducts: ${ex.toString()}');
     }
@@ -64,6 +59,6 @@ class CatalogBloc extends BlocBase<BaseEvent, BaseState> {
   }
 
   getProducts() {
-    add(GetCatalogEvent(initialState.products));
+    add(GetCatalogEvent());
   }
 }

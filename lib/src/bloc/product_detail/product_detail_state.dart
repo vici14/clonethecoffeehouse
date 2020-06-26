@@ -1,5 +1,5 @@
 import 'package:flutterclonethecoffeehouse/src/bloc/base/base_state.dart';
-import 'package:flutterclonethecoffeehouse/src/data/repository/models/product_repository.dart';
+import 'package:flutterclonethecoffeehouse/src/data/models/product_repository.dart';
 
 class ProductDetailState extends BaseState {
   final ProductResponseRepository product;

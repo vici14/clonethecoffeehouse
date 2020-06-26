@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutterclonethecoffeehouse/src/data/repository/models/product_repository.dart';
+import 'package:flutterclonethecoffeehouse/src/data/models/entities.dart';
 import 'package:flutterclonethecoffeehouse/src/modules/order/bloc/catalog_bloc.dart';
 import 'package:flutterclonethecoffeehouse/src/theme/my_colors.dart';
 
 enum Cost { five, ten, zero }
 
 class ProductDetailDialog extends StatefulWidget {
-  final ProductResponseRepository product;
+  final ProductEntity product;
   final CatalogBloc catalogBloc;
 
   const ProductDetailDialog({Key key, this.product, this.catalogBloc})

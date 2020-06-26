@@ -1,15 +1,14 @@
-import 'dart:convert';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
-import 'package:flutterclonethecoffeehouse/src/data/repository/models/entities.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutterclonethecoffeehouse/src/data/models/product_repository.dart';
 import 'package:flutterclonethecoffeehouse/src/data/repository/products_repository.dart';
 
 class ProductRepositoryImpl implements ProductsRepository {
   final productsCollection = Firestore.instance.collection('products');
 
   @override
-  Future<List<ProductEntity>> getProducts(List<String> category) async {
+  Future<List<ProductResponseRepository>> getProducts(
+      List<String> category) async {
     try {
       var products = await productsCollection
           .where('category', whereIn: category)
@@ -19,7 +18,7 @@ class ProductRepositoryImpl implements ProductsRepository {
       debugPrint('test getProducts');
       if (products.documents.isNotEmpty) {
         return products.documents
-            .map((snap) => ProductEntity.fromSnapshot(snap))
+            .map((snap) => ProductResponseRepository.fromSnapshot(snap))
             .toList();
       }
     } catch (e) {

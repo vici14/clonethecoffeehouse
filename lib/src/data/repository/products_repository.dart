@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:flutterclonethecoffeehouse/src/data/repository/models/entities.dart';
+import 'package:flutterclonethecoffeehouse/src/data/models/product_repository.dart';
 
 abstract class ProductsRepository {
-  Future<List<ProductEntity>> getProducts(List<String> category);
+  Future<List<ProductResponseRepository>> getProducts(List<String> categories);
 
 //  Future<void> updateProduct(Product product);
 

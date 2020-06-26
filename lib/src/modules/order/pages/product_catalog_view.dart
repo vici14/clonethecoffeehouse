@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutterclonethecoffeehouse/src/data/repository/firebase_products_repository.dart';
-import 'package:flutterclonethecoffeehouse/src/data/repository/products_repository.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutterclonethecoffeehouse/src/modules/order/bloc/catalog_bloc.dart';
 import 'package:flutterclonethecoffeehouse/src/modules/order/bloc/catalog_state.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutterclonethecoffeehouse/src/theme/my_colors.dart';
 import 'package:flutterclonethecoffeehouse/src/widgets/stateful/fancy_fab_filter.dart';
 import 'package:flutterclonethecoffeehouse/src/widgets/stateful/product_detail_dialog.dart';
@@ -23,10 +21,9 @@ class ProductCategoryScreen extends StatefulWidget {
 
 class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
   CatalogBloc bloc;
-  ProductsRepository productsRepository = ProductRepositoryImpl();
 
   _ProductCategoryScreenState({CatalogTypes type}) {
-    bloc = CatalogBloc(type: type, productsRepository: productsRepository);
+    bloc = CatalogBloc(type: type);
     bloc.getProducts();
   }
 
@@ -43,7 +40,7 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
         color: Theme.of(context).disabledColor.withOpacity(0.3),
         child: BlocBuilder(
             bloc: bloc,
-            builder: (BuildContext context, state) {
+            builder: (BuildContext context, CatalogState state) {
               if (state.isLoading == true) {
                 return Center(child: CircularProgressIndicator());
               }
@@ -134,7 +131,7 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
                                         Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Text(
-                                            product.cost.toString(),
+                                            product.priceValue,
                                             style: TextStyle(
                                                 fontWeight: FontWeight.w600),
                                           ),

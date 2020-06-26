@@ -1,16 +1,13 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutterclonethecoffeehouse/src/bloc/base/base_state.dart';
-import 'package:flutterclonethecoffeehouse/src/data/repository/models/product_repository.dart';
+import 'package:flutterclonethecoffeehouse/src/domain/entities/product_entity.dart';
 
 enum CatalogTypes { POPULAR, DRINK, FOOD }
 
 class CatalogState extends BaseState {
-  final List<ProductResponseRepository> products;
+  final List<ProductEntity> products;
 
   CatalogState(
-      {List<ProductResponseRepository> products,
-      CatalogState state,
-      bool isLoading})
+      {List<ProductEntity> products, CatalogState state, bool isLoading})
       : products = products ?? state?.products,
         super(
             isLoading: isLoading ?? state?.isLoading,
@@ -18,12 +15,10 @@ class CatalogState extends BaseState {
 }
 
 class DrinksCatalogState extends BaseState {
-  final List<ProductResponseRepository> drinks;
+  final List<ProductEntity> drinks;
 
   DrinksCatalogState(
-      {List<ProductResponseRepository> products,
-      DrinksCatalogState state,
-      bool isLoading})
+      {List<ProductEntity> products, DrinksCatalogState state, bool isLoading})
       : drinks = products ?? state?.drinks,
         super(
             isLoading: isLoading ?? state?.isLoading,
@@ -31,12 +26,10 @@ class DrinksCatalogState extends BaseState {
 }
 
 class CakesCatalogState extends BaseState {
-  final List<ProductResponseRepository> cakes;
+  final List<ProductEntity> cakes;
 
   CakesCatalogState(
-      {List<ProductResponseRepository> products,
-      CakesCatalogState state,
-      bool isLoading})
+      {List<ProductEntity> products, CakesCatalogState state, bool isLoading})
       : cakes = products ?? state?.cakes,
         super(
             isLoading: isLoading ?? state?.isLoading,
