@@ -32,10 +32,9 @@ dev_dependencies:
   equatable: ^1.2.0
   cloud_firestore: ^0.13.6
   json_serializable: ^3.3.0
-  build_runner: ^1.10.0
-  json_annotation: ^3.0.1
   firebase_core: ^0.4.5
-
+  google_maps_flutter: ^0.5.27+3
+  geolocator: ^5.3.2+2
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

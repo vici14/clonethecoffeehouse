@@ -38,7 +38,8 @@ class ProductDetailBloc extends BlocBase<BaseEvent, ProductDetailState> {
     yield ProductDetailState(quantity: state.quantity);
   }
 
-  Stream<ProductDetailState> _chooseSizeProductState(ChooseSizeProductEvent event) async* {
+  Stream<ProductDetailState> _chooseSizeProductState(
+      ChooseSizeProductEvent event) async* {
     yield ProductDetailState();
 
     yield ProductDetailState();

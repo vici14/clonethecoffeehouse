@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "636833801272",
+    "firebase_url": "https://thecoffeehouseclone.firebaseio.com",
+    "project_id": "thecoffeehouseclone",
+    "storage_bucket": "thecoffeehouseclone.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:636833801272:android:ebe3f3219637f52db532cd",
+        "android_client_info": {
+          "package_name": "com.example.flutterclonethecoffeehouse"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "636833801272-3tcs2pc7hmg2ndg2ov7g29k8j2h34n6m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flutterclonethecoffeehouse",
+            "certificate_hash": "e3359dec2cd556455a365b54771d0a070426f309"
+          }
+        },
+        {
+          "client_id": "636833801272-c2n1h21i2qor473ukcv16r51selghq2h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJdGTvOS3bN3MCfU6uI39ic2Xy1mHZLhE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "636833801272-c2n1h21i2qor473ukcv16r51selghq2h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "636833801272-u1sdg1406q3vvpbt5lp84r8ov29tp2rf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterclonethecoffeehouse"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

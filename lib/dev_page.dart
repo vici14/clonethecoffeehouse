@@ -20,10 +20,10 @@ class _DevPageState extends State<DevPage> {
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: <Widget>[
-//          ItemDevPage(
-//            title: 'News Page',
-//            routeName: RouteName.newsPage,
-//          ),
+          ItemDevPage(
+            title: 'News Page',
+            routeName: RouteName.newsPage,
+          ),
           ItemDevPage(
             title: 'My Profile Page',
             routeName: RouteName.myProfilePage,
@@ -31,6 +31,14 @@ class _DevPageState extends State<DevPage> {
           ItemDevPage(
             title: 'Order Page',
             routeName: RouteName.orderPage,
+          ),
+          ItemDevPage(
+            title: 'Dashboard Page',
+            routeName: RouteName.dashBoardPage,
+          ),
+          ItemDevPage(
+            title: 'GoogleMap Page',
+            routeName: RouteName.googleMapPage,
           )
         ],
       ),
@@ -41,6 +49,7 @@ class _DevPageState extends State<DevPage> {
 class ItemDevPage extends StatelessWidget {
   final String routeName;
   final String title;
+
   const ItemDevPage({Key key, @required this.routeName, @required this.title})
       : super(key: key);
 

@@ -1,6 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterclonethecoffeehouse/src/modules/dashboard/pages/news_page.dart';
+import 'package:flutterclonethecoffeehouse/src/modules/home/model/item_card.dart';
+import 'package:flutterclonethecoffeehouse/src/modules/home/pages/dashboard_page.dart';
+import 'package:flutterclonethecoffeehouse/src/modules/home/pages/home_page.dart';
+import 'package:flutterclonethecoffeehouse/src/modules/home/pages/info_detail_page.dart';
+import 'package:flutterclonethecoffeehouse/src/modules/map/pages/google_map_page.dart';
 import 'package:flutterclonethecoffeehouse/src/modules/myprofile/my_profile_page.dart';
 import 'package:flutterclonethecoffeehouse/src/modules/order/pages/order_page.dart';
 import 'package:flutterclonethecoffeehouse/src/route/route_name.dart';
@@ -9,11 +13,26 @@ class RouteGenerator {
   static Route routeAll(RouteSettings settings) {
     switch (settings.name) {
       case RouteName.newsPage:
-        return _buildRoute(settings, NewsPage());
+        return _buildRoute(settings, HomePage());
+      case RouteName.dashBoardPage:
+        return _buildRoute(settings, DashBoardPage());
       case RouteName.myProfilePage:
         return _buildRoute(settings, MyProfilePage());
       case RouteName.orderPage:
         return _buildRoute(settings, CatalogPage());
+      case RouteName.infoDetailPage:
+        ItemCard itemCard;
+        if (settings.arguments is ItemCard) {
+          itemCard = settings.arguments;
+          return _buildRoute(
+              settings,
+              InfoDetailPage(
+                itemCard: itemCard,
+              ));
+        }
+        return _errorRoute();
+      case RouteName.googleMapPage:
+        return _buildRoute(settings, GoogleMapPage());
       default:
         return _errorRoute();
     }

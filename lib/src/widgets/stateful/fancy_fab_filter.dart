@@ -71,6 +71,7 @@ class _FancyFABFilterState extends State<FancyFABFilter>
 
   Widget toggle() {
     return FloatingActionButton(
+      mini: true,
       elevation: 1,
       backgroundColor: _animateButtonColor.value,
       onPressed: animate,
@@ -94,7 +95,10 @@ class _FancyFABFilterState extends State<FancyFABFilter>
                 transform: Matrix4.translationValues(
                     50, _translateButton.value * 5, 0),
                 child: filterList(context)),
-            toggle(),
+            Padding(
+              padding: const EdgeInsets.only(right: 100),
+              child: toggle(),
+            ),
           ],
         ),
       ),
