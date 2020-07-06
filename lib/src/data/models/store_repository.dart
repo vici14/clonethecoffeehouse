@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class StoreResponseRepository {
   final String id;
   final String address;
@@ -22,27 +20,11 @@ class StoreResponseRepository {
 
   static StoreResponseRepository fromJson(Map<String, Object> json) {
     return StoreResponseRepository(
-      json["id"] as String,
-      json["address"] as String,
-      json["district"] as String,
-      json["imgUrl"] as String,
-      json["coordinate"] as Coordinate,
-    );
-  }
-
-  static StoreResponseRepository fromSnapShot(DocumentSnapshot snapshot) {
-    try {
-      return StoreResponseRepository(
-        snapshot.documentID,
-        snapshot.data['address'],
-        snapshot.data['district'],
-        snapshot.data['imgUrl'],
-        snapshot.data['coordinate'],
-      );
-    } catch (ex) {
-      return StoreResponseRepository(
-          'ID', '0000000000', '000000', 'imgUrl', Coordinate(0.002, 1));
-    }
+        json["id"] as String,
+        json["address"] as String,
+        json["district"] as String,
+        json["imgUrl"] as String,
+        Coordinate.fromJson(json["coordinate"]));
   }
 }
 
@@ -51,4 +33,18 @@ class Coordinate {
   final double longtitude;
 
   Coordinate(this.latitude, this.longtitude);
+
+  Map<String, Object> toJson() {
+    return {
+      "lat": latitude,
+      "lng": longtitude,
+    };
+  }
+
+  static Coordinate fromJson(Map<String, Object> json) {
+    return Coordinate(
+      json["lat"] as double,
+      json["lng"] as double,
+    );
+  }
 }

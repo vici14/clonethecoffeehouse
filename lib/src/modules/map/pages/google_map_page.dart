@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutterclonethecoffeehouse/src/modules/map/bloc/store_bloc.dart';
 import 'package:flutterclonethecoffeehouse/src/modules/map/bloc/store_state.dart';
-import 'package:flutterclonethecoffeehouse/src/utils/uidata.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -43,24 +42,13 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
   @override
   void initState() {
     super.initState();
-    setCustomMyIcon();
+//    setCustomMyIcon();
     _getUserLocation();
-  }
-
-  void setCustomMyIcon() async {
-    myIcon = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(devicePixelRatio: 2.5), UIData.icShip);
-  }
-
-  void _getUserLocation() async {
-    Position position = await Geolocator()
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    List<Placemark> placemark = await Geolocator()
-        .placemarkFromCoordinates(position.latitude, position.longitude);
-    setState(() {
-      _initialPosition = LatLng(position.latitude, position.longitude);
-      print('aaa${placemark[0].name}');
-    });
+    drawAllMarkers();
+//    myMarkers.add(Marker(
+//      markerId: MarkerId("00"),
+//      position: LatLng(10.782595, 106.680088),
+//    ));
   }
 
   void initMarker(request, requestID) {
@@ -93,6 +81,22 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
     );
   }
 
+//  void setCustomMyIcon() async {
+//    myIcon = await BitmapDescriptor.fromAssetImage(
+//        ImageConfiguration(devicePixelRatio: 2.5), UIData.icShip);
+//  }
+
+  void _getUserLocation() async {
+    Position position = await Geolocator()
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    List<Placemark> placemark = await Geolocator()
+        .placemarkFromCoordinates(position.latitude, position.longitude);
+    setState(() {
+      _initialPosition = LatLng(position.latitude, position.longitude);
+      print('aaa${placemark[0].name}');
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var mapWidth = MediaQuery.of(context).size.width;
@@ -110,12 +114,20 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
                     if (state.isLoading == true) {
                       return Center(child: CircularProgressIndicator());
                     }
-                    for (var i = 0; i < state.stores.length; i++) {
-                      print('storelength222 ${state?.stores?.length}');
-                      myMarkers.add(Marker(
-                          markerId: MarkerId(state.stores[i].id),
-                          position: LatLng(state.stores[i].coordinate.latitude,
-                              state.stores[i].coordinate.longtitude)));
+                    if (myMarkers.isEmpty) {
+                      for (var i = 0; i < state.stores.length; i++) {
+                        print('storelength222 ${state?.stores?.length}');
+                        Marker resultMarker = Marker(
+                            icon: myIcon,
+                            markerId: MarkerId(state.stores[i].id.toString()),
+                            position: LatLng(
+                                state.stores[i].coordinate.latitude,
+                                state.stores[i].coordinate.longtitude));
+                        print(
+                            '11111${state.stores[i].coordinate.latitude},${state
+                                .stores[i].coordinate.longtitude}');
+                        myMarkers.add(resultMarker);
+                      }
                     }
                     return Container(
                       width: mapWidth,
@@ -129,8 +141,8 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
                         myLocationButtonEnabled: true,
                         scrollGesturesEnabled: true,
                         initialCameraPosition:
-                            CameraPosition(target: _initialPosition, zoom: 13),
-                        markers: Set<Marker>.of(myMarkers),
+                        CameraPosition(target: _initialPosition, zoom: 13),
+                        markers: Set.of(myMarkers),
                         onCameraMove: (CameraPosition position) {
                           findCenterPosition(position);
                           findClosestMarker(position);
@@ -144,13 +156,54 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
                 top: (mapHeight - iconSize) / 2,
                 right: (mapWidth - iconSize) / 2,
                 child: new Icon(Icons.person_pin_circle,
-                    color: Theme.of(context).primaryColor, size: iconSize),
+                    color: Theme
+                        .of(context)
+                        .primaryColor, size: iconSize),
               )
             ],
           )
         ],
       ),
     );
+  }
+
+//
+  void _onMapCreated(GoogleMapController controller) async {
+    var INITIAL_LOCATION = _initialPosition;
+    _mapController.complete(controller);
+    if ([INITIAL_LOCATION] != null) {
+      MarkerId markerId = MarkerId(_markerIdVal());
+      LatLng position = INITIAL_LOCATION;
+      Marker marker = Marker(
+        icon:
+        BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueMagenta),
+        markerId: markerId,
+        position: position,
+        draggable: false,
+      );
+
+//      setState(() {
+//        _markers[markerId] = marker;
+//      });
+
+      Future.delayed(Duration(milliseconds: 200), () async {
+        GoogleMapController controller = await _mapController.future;
+        controller.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: position,
+              zoom: 16.0,
+            ),
+          ),
+        );
+      });
+    }
+  }
+
+  String _markerIdVal({bool increment = false}) {
+    String val = 'marker_id_$_markerIdCounter';
+    if (increment) _markerIdCounter++;
+    return val;
   }
 
   findCenterPosition(CameraPosition cameraPosition) {
@@ -161,10 +214,6 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
         positionParam: cameraPosition.target,
       );
     }
-  }
-
-  rad(x) {
-    return x * Math.pi / 180;
   }
 
   findClosestMarker(CameraPosition cameraPosition) {
@@ -195,40 +244,7 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
     print('RESULT ${myMarkers[closest].markerId}');
   }
 
-  void _onMapCreated(GoogleMapController controller) async {
-    var INITIAL_LOCATION = _initialPosition;
-    _mapController.complete(controller);
-    if ([INITIAL_LOCATION] != null) {
-      MarkerId markerId = MarkerId(_markerIdVal());
-      LatLng position = INITIAL_LOCATION;
-      Marker marker = Marker(
-        icon:
-            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueMagenta),
-        markerId: markerId,
-        position: position,
-        draggable: false,
-      );
-      setState(() {
-        _markers[markerId] = marker;
-      });
-
-      Future.delayed(Duration(milliseconds: 200), () async {
-        GoogleMapController controller = await _mapController.future;
-        controller.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(
-              target: position,
-              zoom: 16.0,
-            ),
-          ),
-        );
-      });
-    }
-  }
-
-  String _markerIdVal({bool increment = false}) {
-    String val = 'marker_id_$_markerIdCounter';
-    if (increment) _markerIdCounter++;
-    return val;
+  rad(x) {
+    return x * Math.pi / 180;
   }
 }
