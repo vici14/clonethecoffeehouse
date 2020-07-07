@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterclonethecoffeehouse/src/domain/entities/store_entity.dart';
+import 'package:flutterclonethecoffeehouse/src/utils/map_util.dart';
 
 class InfoDetailStorePage extends StatefulWidget {
   final StoreEntity store;
@@ -41,7 +42,7 @@ class _InfoDetailStorePageState extends State<InfoDetailStorePage> {
                 children: <Widget>[
                   Container(
                     margin: EdgeInsets.all(15),
-                    color: Colors.green,
+                    color: Colors.grey.withOpacity(0.5),
                     width: double.infinity,
                     height: 100,
                   ),
@@ -65,7 +66,10 @@ class _InfoDetailStorePageState extends State<InfoDetailStorePage> {
                       child: Padding(
                         padding: EdgeInsets.only(left: 180),
                         child: InkWell(
-                          onTap: () {},
+                          onTap: () {
+                            return MapUtils.openMap(store.coordinate.latitude,
+                                store.coordinate.longtitude);
+                          },
                           child: Container(
                             decoration: BoxDecoration(
                                 borderRadius:
@@ -101,7 +105,10 @@ class _InfoDetailStorePageState extends State<InfoDetailStorePage> {
             Container(
               color: Theme.of(context).canvasColor,
               child: ListTile(
-                leading: Icon(Icons.access_time),
+                leading: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Icon(Icons.access_time),
+                ),
                 title: Text("Giờ mở cửa "),
                 subtitle: Text("7:00 - 22:30"),
               ),
@@ -109,7 +116,10 @@ class _InfoDetailStorePageState extends State<InfoDetailStorePage> {
             Container(
               color: Theme.of(context).canvasColor,
               child: ListTile(
-                leading: Icon(Icons.phone),
+                leading: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Icon(Icons.phone),
+                ),
                 title: Text("Liên hệ "),
                 subtitle: Text("02871087008"),
               ),

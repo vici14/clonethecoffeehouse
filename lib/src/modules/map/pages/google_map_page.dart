@@ -86,74 +86,77 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
   @override
   Widget build(BuildContext context) {
     var mapWidth = MediaQuery.of(context).size.width;
-    var mapHeight = MediaQuery.of(context).size.height * 0.92;
+    var mapHeight = MediaQuery.of(context).size.height * 0.92 - 57;
     double iconSize = 40.0;
     return Scaffold(
-      body: Column(
-        children: <Widget>[
-          BlocBuilder(
-              bloc: bloc,
-              builder: (BuildContext context, StoreState state) {
-                print('storelength ${state?.stores?.length}');
-                if (state.isLoading == true) {
-                  return Center(child: CircularProgressIndicator());
-                }
-
-                if (myMarkers.isEmpty) {
-                  for (var i = 0; i < state.stores.length; i++) {
-                    var store = state.stores[i];
-                    Marker resultMarker = Marker(
-                        icon: myIcon,
-                        markerId: MarkerId(store.id.toString()),
-                        infoWindow: InfoWindow(
-                            title: store.address,
-                            snippet: 'Quận ${store.district}'),
-                        position: LatLng(store.coordinate.latitude,
-                            store.coordinate.longtitude));
-                    myMarkers.add(resultMarker);
+      body: SafeArea(
+        bottom: true,
+        child: Column(
+          children: <Widget>[
+            BlocBuilder(
+                bloc: bloc,
+                builder: (BuildContext context, StoreState state) {
+                  print('storelength ${state?.stores?.length}');
+                  if (state.isLoading == true) {
+                    return Center(child: CircularProgressIndicator());
                   }
-                }
-                return Stack(
-                  children: <Widget>[
-                    Container(
-                      width: mapWidth,
-                      height: mapHeight,
-                      child: GoogleMap(
-                        onMapCreated: (controller) =>
-                            mapController = controller,
-                        myLocationEnabled: true,
-                        buildingsEnabled: true,
-                        zoomGesturesEnabled: true,
-                        zoomControlsEnabled: true,
-                        myLocationButtonEnabled: true,
-                        scrollGesturesEnabled: true,
-                        initialCameraPosition: _tchRBB,
-                        markers: Set.of(myMarkers),
-                        onCameraMove: (CameraPosition position) {
-                          findCenterPosition(position);
-                          findClosestMarker(position);
+
+                  if (myMarkers.isEmpty) {
+                    for (var i = 0; i < state.stores.length; i++) {
+                      var store = state.stores[i];
+                      Marker resultMarker = Marker(
+                          icon: myIcon,
+                          markerId: MarkerId(store.id.toString()),
+                          infoWindow: InfoWindow(
+                              title: store.address,
+                              snippet: 'Quận ${store.district}'),
+                          position: LatLng(store.coordinate.latitude,
+                              store.coordinate.longtitude));
+                      myMarkers.add(resultMarker);
+                    }
+                  }
+                  return Stack(
+                    children: <Widget>[
+                      Container(
+                        width: mapWidth,
+                        height: mapHeight,
+                        child: GoogleMap(
+                          onMapCreated: (controller) =>
+                              mapController = controller,
+                          myLocationEnabled: true,
+                          buildingsEnabled: true,
+                          zoomGesturesEnabled: true,
+                          zoomControlsEnabled: true,
+                          myLocationButtonEnabled: true,
+                          scrollGesturesEnabled: true,
+                          initialCameraPosition: _tchRBB,
+                          markers: Set.of(myMarkers),
+                          onCameraMove: (CameraPosition position) {
+                            findCenterPosition(position);
+                            findClosestMarker(position);
 //                          print(position);
 //                          print(findClosestMarker(position));
-                        },
+                          },
+                        ),
                       ),
-                    ),
-                    Positioned(
-                      bottom: 1,
-                      child: ListStore(
-                        stores: state.stores,
+                      Positioned(
+                        bottom: 1,
+                        child: ListStore(
+                          stores: state.stores,
+                        ),
                       ),
-                    ),
-                    Positioned(
-                      top: (mapHeight - iconSize) / 2,
-                      right: (mapWidth - iconSize) / 2,
-                      child: new Icon(Icons.person_pin_circle,
-                          color: Theme.of(context).primaryColor,
-                          size: iconSize),
-                    )
-                  ],
-                );
-              }),
-        ],
+                      Positioned(
+                        top: (mapHeight - iconSize) / 2,
+                        right: (mapWidth - iconSize) / 2,
+                        child: new Icon(Icons.person_pin_circle,
+                            color: Theme.of(context).primaryColor,
+                            size: iconSize),
+                      )
+                    ],
+                  );
+                }),
+          ],
+        ),
       ),
     );
   }

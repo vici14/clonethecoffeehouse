@@ -55,10 +55,14 @@ class _ListStoreState extends State<ListStore> {
                       ),
                     ),
                     Container(
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).canvasColor,
+                          borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(15),
+                              bottomRight: Radius.circular(15))),
                       padding: EdgeInsets.only(left: 5),
                       height: MediaQuery.of(context).size.height * 0.1,
                       width: double.infinity,
-                      color: Theme.of(context).canvasColor,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
