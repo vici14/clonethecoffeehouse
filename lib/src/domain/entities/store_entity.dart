@@ -7,6 +7,7 @@ class StoreEntity {
   final Coordinate coordinate;
   final String imgUrl;
 
+  String get fullAddress => '${address}, Quận ${district}, Hồ Chí Minh ';
   StoreEntity(
       {this.id, this.address, this.district, this.coordinate, this.imgUrl});
 

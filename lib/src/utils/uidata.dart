@@ -10,4 +10,5 @@ class UIData {
   static const String icShop = '$imageDir/ic_shop.png';
   static const String icAccount = '$imageDir/ic_account.png';
   static const String icCoupon = '$imageDir/ic_coupon.png';
+  static const String icCoffee = '$imageDir/ic_coffee.png';
 }

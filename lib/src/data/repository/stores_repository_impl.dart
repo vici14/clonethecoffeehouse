@@ -11,9 +11,9 @@ class StoresRepositoryImp implements StoresRepository {
     try {
       var stores = await storesCollection.getDocuments();
       if (stores.documents.isNotEmpty) {
-        debugPrint('test getStore');
-        stores.documents?.forEach((s) => debugPrint(s.data.toString()));
-        debugPrint('test getStore');
+//        debugPrint('test getStore');
+//        stores.documents?.forEach((s) => debugPrint(s.data.toString()));
+//        debugPrint('test getStore');
         return stores?.documents
             ?.map((snap) => StoreResponseRepository?.fromJson(snap.data))
             ?.toList();
