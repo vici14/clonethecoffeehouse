@@ -20,6 +20,7 @@ class _InfoDetailStorePageState extends State<InfoDetailStorePage> {
     var store = widget.store;
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).canvasColor,
         title: Text(store.address),
       ),
       body: SingleChildScrollView(

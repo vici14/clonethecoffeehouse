@@ -18,14 +18,16 @@ class StoreResponseRepository {
     };
   }
 
-  static StoreResponseRepository fromJson(Map<String, Object> json) {
+  static StoreResponseRepository fromJson(
+      {String id, Map<String, Object> json}) {
     return StoreResponseRepository(
-        json["id"] as String,
+        id,
         json["address"] as String,
         json["district"] as String,
         json["imgUrl"] as String,
         Coordinate.fromJson(json["coordinate"]));
   }
+//  static StoreResponseRepository fromSnapshot(DocumentSnapshot snap)
 }
 
 class Coordinate {

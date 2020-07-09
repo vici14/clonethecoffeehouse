@@ -27,7 +27,8 @@ class ProductResponseRepository {
     return 'ProductEntity {id: $id, name: $name, cost: $cost, imgUrl: $imgUrl, description: $description, category: $category} ';
   }
 
-  static ProductResponseRepository fromJson(Map<String, Object> json) {
+  static ProductResponseRepository fromJson(
+      {String id, Map<String, Object> json}) {
     return ProductResponseRepository(
       json["id"] as String,
       json["name"] as String,

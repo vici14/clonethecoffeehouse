@@ -1,9 +1,9 @@
-import 'dart:async';
 import 'dart:math' as Math;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutterclonethecoffeehouse/src/domain/entities/store_entity.dart';
 import 'package:flutterclonethecoffeehouse/src/modules/map/bloc/store_bloc.dart';
 import 'package:flutterclonethecoffeehouse/src/modules/map/bloc/store_state.dart';
 import 'package:flutterclonethecoffeehouse/src/utils/uidata.dart';
@@ -25,58 +25,26 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
     bloc.getStores();
   }
 
+  List<StoreEntity> updatedStore = [];
+  CameraPosition lastLocation =
+      CameraPosition(target: LatLng(10.782595, 106.680088));
   GoogleMapController mapController;
   List<Marker> myMarkers = [];
-  Completer<GoogleMapController> _mapController = Completer();
-  Map<MarkerId, Marker> _markers = <MarkerId, Marker>{};
-  int _markerIdCounter = 0;
   static BitmapDescriptor myIcon;
-  List<Marker> updatedList = [];
+  List<DistanceMarker> distanceMarkers = [];
+  List<DistanceMarker> updatedList = [];
 
   static final CameraPosition _tchRBB = CameraPosition(
     target: LatLng(10.782595, 106.680088),
     bearing: 15.0,
-    zoom: 18,
+    zoom: 15,
   );
 
   @override
   void initState() {
     super.initState();
     setCustomMyIcon();
-//    drawAllMarkers();
   }
-
-//  void initMarker(request, requestID) {
-//    var markerIdVal = requestID;
-//    final MarkerId markerId = MarkerId(markerIdVal);
-//
-//    ///createing a new Marker
-//    final Marker marker = Marker(
-//        markerId: markerId,
-//        position: LatLng(
-//            request['location'].latitude, request['location'].longtitude),
-//        infoWindow:
-//            InfoWindow(title: "Fetched Markers", snippet: request['address']));
-//    setState(() {
-//      _markers[markerId] = marker;
-//      print(markerId);
-//    });
-//  }
-//
-//  drawAllMarkers() {
-//    return BlocBuilder(
-//      bloc: bloc,
-//      builder: (BuildContext context, StoreState state) {
-//        if (state.stores.isNotEmpty) {
-//          for (var i = 0; i < state.stores.length; i++) {
-//            initMarker(state.stores[i].coordinate, state.stores[i].id);
-//          }
-//
-//        }
-//        return Container();
-//      },
-//    );
-//  }
 
   void setCustomMyIcon() async {
     myIcon = await BitmapDescriptor.fromAssetImage(
@@ -96,11 +64,9 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
             BlocBuilder(
                 bloc: bloc,
                 builder: (BuildContext context, StoreState state) {
-                  print('storelength ${state?.stores?.length}');
                   if (state.isLoading == true) {
                     return Center(child: CircularProgressIndicator());
                   }
-
                   if (myMarkers.isEmpty) {
                     for (var i = 0; i < state.stores.length; i++) {
                       var store = state.stores[i];
@@ -115,6 +81,7 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
                       myMarkers.add(resultMarker);
                     }
                   }
+
                   return Stack(
                     children: <Widget>[
                       Container(
@@ -122,7 +89,7 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
                         height: mapHeight,
                         child: GoogleMap(
                           onMapCreated: (controller) =>
-                              mapController = controller,
+                          mapController = controller,
                           myLocationEnabled: true,
                           buildingsEnabled: true,
                           zoomGesturesEnabled: true,
@@ -131,18 +98,32 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
                           scrollGesturesEnabled: true,
                           initialCameraPosition: _tchRBB,
                           markers: Set.of(myMarkers),
+                          onCameraIdle: () {
+                            List<StoreEntity> queryStore = [];
+                            updatedList =
+                                findFiveClosestStore(lastLocation, myMarkers);
+                            for (var i = 0; i < updatedList.length; i++) {
+                              for (var j = 0; j < state.stores.length; j++) {
+                                if (updatedList[i].markerId.value ==
+                                    state.stores[j].id) {
+                                  queryStore.add(state.stores[j]);
+                                }
+                              }
+                              setState(() {
+                                updatedStore = queryStore;
+                              });
+                            }
+                            return updatedStore;
+                          },
                           onCameraMove: (CameraPosition position) {
-                            findCenterPosition(position);
-                            findClosestMarker(position);
-//                          print(position);
-//                          print(findClosestMarker(position));
+                            lastLocation = position;
                           },
                         ),
                       ),
                       Positioned(
                         bottom: 1,
                         child: ListStore(
-                          stores: state.stores,
+                          stores: updatedStore,
                         ),
                       ),
                       Positioned(
@@ -161,31 +142,16 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
     );
   }
 
-  String _markerIdVal({bool increment = false}) {
-    String val = 'marker_id_$_markerIdCounter';
-    if (increment) _markerIdCounter++;
-    return val;
-  }
-
-  findCenterPosition(CameraPosition cameraPosition) {
-    if (_markers.length > 0) {
-      MarkerId markerId = MarkerId(_markerIdVal());
-      Marker marker = _markers[markerId];
-      Marker updatedMarker = marker.copyWith(
-        positionParam: cameraPosition.target,
-      );
-    }
-  }
-
-  findClosestMarker(CameraPosition cameraPosition) {
-    var cameraLat = cameraPosition?.target?.latitude;
-    var cameraLong = cameraPosition?.target?.longitude;
+  List<DistanceMarker> findFiveClosestStore(CameraPosition lastLocation,
+      List<Marker> markers) {
+    List<DistanceMarker> list = [];
+    var cameraLat = lastLocation?.target?.latitude;
+    var cameraLong = lastLocation?.target?.longitude;
     var R = 6371; // radius of earth in km
     var distances = [];
-    var closest = -1;
-    for (var i = 0; i < myMarkers.length; i++) {
-      var markerLat = myMarkers[i].position.latitude;
-      var markerLong = myMarkers[i].position.longitude;
+    for (var i = 0; i < markers.length; i++) {
+      var markerLat = markers[i]?.position?.latitude;
+      var markerLong = markers[i]?.position?.longitude;
       var distanceLat = rad(markerLat - cameraLat);
       var distanceLong = rad(markerLong - cameraLong);
       var a = Math.sin(distanceLat / 2) * Math.sin(distanceLat / 2) +
@@ -196,16 +162,32 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
       var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       var d = R * c;
       distances.add(d);
-      if (closest == -1 || d < distances[closest]) {
-        closest = i;
 
-        /// minimum distance
-      }
+      DistanceMarker resultMarker =
+      DistanceMarker(markers[i].markerId, distances[i]);
+
+      list.add(resultMarker);
     }
-    print('RESULT ${myMarkers[closest].position.latitude}');
+    list.sort((a, b) => a?.distance?.compareTo(b?.distance));
+//    list = list.take(3).toList();
+
+    List<DistanceMarker> updateList = [];
+    int max = (list.length > 5) ? 5 : list.length;
+    for (var i = 0; i < max; i++) {
+      updateList.add(list[i]);
+    }
+
+    return updateList;
   }
 
   rad(x) {
     return x * Math.pi / 180;
   }
+}
+
+class DistanceMarker {
+  final MarkerId markerId;
+  final double distance;
+
+  DistanceMarker(this.markerId, this.distance);
 }

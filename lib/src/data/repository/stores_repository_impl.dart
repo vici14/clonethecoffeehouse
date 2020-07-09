@@ -15,7 +15,8 @@ class StoresRepositoryImp implements StoresRepository {
 //        stores.documents?.forEach((s) => debugPrint(s.data.toString()));
 //        debugPrint('test getStore');
         return stores?.documents
-            ?.map((snap) => StoreResponseRepository?.fromJson(snap.data))
+            ?.map((snap) => StoreResponseRepository?.fromJson(
+                id: snap.documentID, json: snap.data))
             ?.toList();
       }
     } catch (e) {
