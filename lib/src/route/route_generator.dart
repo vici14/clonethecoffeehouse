@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterclonethecoffeehouse/src/modules/cart/pages/cart_page.dart';
+import 'package:flutterclonethecoffeehouse/src/modules/dashboard/pages/dashboard_page.dart';
 import 'package:flutterclonethecoffeehouse/src/modules/home/model/item_card.dart';
-import 'package:flutterclonethecoffeehouse/src/modules/home/pages/dashboard_page.dart';
 import 'package:flutterclonethecoffeehouse/src/modules/home/pages/home_page.dart';
 import 'package:flutterclonethecoffeehouse/src/modules/home/pages/info_detail_page.dart';
 import 'package:flutterclonethecoffeehouse/src/modules/map/pages/google_map_page.dart';
@@ -18,6 +19,8 @@ class RouteGenerator {
         return _buildRoute(settings, DashBoardPage());
       case RouteName.myProfilePage:
         return _buildRoute(settings, MyProfilePage());
+      case RouteName.cartPage:
+        return _buildRoute(settings, CartPage());
       case RouteName.orderPage:
         return _buildRoute(settings, CatalogPage());
       case RouteName.infoDetailPage:

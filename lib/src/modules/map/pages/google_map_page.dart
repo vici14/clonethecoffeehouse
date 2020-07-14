@@ -89,7 +89,7 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
                         height: mapHeight,
                         child: GoogleMap(
                           onMapCreated: (controller) =>
-                          mapController = controller,
+                              mapController = controller,
                           myLocationEnabled: true,
                           buildingsEnabled: true,
                           zoomGesturesEnabled: true,

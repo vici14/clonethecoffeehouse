@@ -39,6 +39,10 @@ class _DevPageState extends State<DevPage> {
           ItemDevPage(
             title: 'GoogleMap Page',
             routeName: RouteName.googleMapPage,
+          ),
+          ItemDevPage(
+            title: 'Cart Page',
+            routeName: RouteName.cartPage,
           )
         ],
       ),

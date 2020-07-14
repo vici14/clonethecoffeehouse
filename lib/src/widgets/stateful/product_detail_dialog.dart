@@ -1,72 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutterclonethecoffeehouse/src/bloc/product_detail/product_detail_bloc.dart';
+import 'package:flutterclonethecoffeehouse/src/bloc/product_detail/product_detail_state.dart';
 import 'package:flutterclonethecoffeehouse/src/data/models/entities.dart';
-import 'package:flutterclonethecoffeehouse/src/modules/order/bloc/catalog_bloc.dart';
 import 'package:flutterclonethecoffeehouse/src/theme/my_colors.dart';
-
-enum Cost { five, ten, zero }
 
 class ProductDetailDialog extends StatefulWidget {
   final ProductEntity product;
-  final CatalogBloc catalogBloc;
+  final Size size;
 
-  const ProductDetailDialog({Key key, this.product, this.catalogBloc})
+  const ProductDetailDialog({Key key, this.product, this.size})
       : super(key: key);
 
   @override
-  _ProductDetailDialogState createState() => _ProductDetailDialogState();
+  _ProductDetailDialogState createState() =>
+      _ProductDetailDialogState(product: product);
 }
 
 class _ProductDetailDialogState extends State<ProductDetailDialog> {
-  Cost _cost = Cost.five;
+  ProductDetailBloc bloc;
+
+  _ProductDetailDialogState({ProductEntity product}) {
+    bloc = ProductDetailBloc(product: product);
+  }
+
   int selectedIndex = -1;
-  int quantity;
-  bool noProduct = false;
   bool isActive = false;
 
   @override
   void initState() {
     super.initState();
-    quantity = 1;
-  }
-
-  void _handleIncrement() {
-    setState(() {
-      quantity++;
-    });
-    if (quantity > 1) {
-      noProduct = false;
-    }
-  }
-
-  void _handleDecrement() {
-    if (quantity > 1) {
-      setState(() {
-        quantity--;
-      });
-    }
-    if (quantity == 1) {
-      noProduct = true;
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(8.0))),
-      child: Container(
-        constraints:
-            BoxConstraints(minHeight: 500, maxHeight: 600, maxWidth: 350),
-        child: Column(
-          children: <Widget>[
-            buildHeader(context),
-            buildBody(context),
-            buildFooter(context)
-          ],
-        ),
-      ),
+    return BlocBuilder(
+      bloc: bloc,
+      builder: (BuildContext context, ProductDetailState state) {
+        if (state.product == null) {
+          return Dialog(
+            backgroundColor: Colors.red,
+          );
+        }
+        return Dialog(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8.0))),
+          child: Container(
+            constraints:
+                BoxConstraints(minHeight: 500, maxHeight: 600, maxWidth: 350),
+            child: Column(
+              children: <Widget>[
+                buildHeader(context),
+                buildBody(context),
+                buildFooter(context)
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -158,21 +151,21 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
             Container(
               child: Column(
                 children: <Widget>[
-                  buildChooseSize("Lớn", "+ 10000đ", 1),
+                  buildChooseSize("Lớn", "+ 10000đ", 0),
                   Divider(
                     height: 1,
                     color: Colors.grey.withOpacity(0.5),
                     indent: 18,
                     endIndent: 18,
                   ),
-                  buildChooseSize("Vừa", "+ 5000đ", 2),
+                  buildChooseSize("Vừa", "+ 5000đ", 1),
                   Divider(
                     height: 1,
                     color: Colors.grey.withOpacity(0.5),
                     indent: 18,
                     endIndent: 18,
                   ),
-                  buildChooseSize("Nhỏ", "", 3),
+                  buildChooseSize("Nhỏ", "", 2),
                 ],
               ),
             ),
@@ -191,17 +184,8 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
             Container(
               child: Column(
                 children: <Widget>[
-                  RadioListTile(
-                    groupValue: _cost,
-                    onChanged: (Cost value) {
-                      setState(() {
-                        _cost = value;
-                      });
-                    },
-                    value: Cost.ten,
-                    title: Text("Trân châu trắng"),
-                    subtitle: Text("+10.000đ"),
-                  )
+                  buildChooseTopping(
+                      index: 0, title: "Trân châu trắng", cost: '10000 đ')
                 ],
               ),
             ),
@@ -242,24 +226,27 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
                   iconSize: 30,
                   icon: Icon(
                     Icons.remove_circle,
-                    color:
-                        (quantity > 1 == true) ? MyColors.red : MyColors.grey,
+                    color: (bloc.state.quantity > 1 == true)
+                        ? MyColors.red
+                        : MyColors.grey,
                   ),
                   onPressed: () {
-                    _handleDecrement();
+                    bloc.decrementQuantity();
                   },
                 ),
               ),
-              Text(quantity.toString()),
+              Text(bloc.state.quantity.toString()),
               Material(
                 child: IconButton(
                   iconSize: 30,
                   icon: Icon(
                     Icons.add_circle,
-                    color: Theme.of(context).buttonColor,
+                    color: Theme
+                        .of(context)
+                        .buttonColor,
                   ),
                   onPressed: () {
-                    _handleIncrement();
+                    bloc.incrementQuantity();
                   },
                 ),
               ),
@@ -269,23 +256,24 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
 //            width: 60,
 //          ),
           InkWell(
-            onTap: () {
-              if (noProduct == true) {
-                Navigator.of(context).pop();
-              }
-            },
+            onTap: () {},
             child: Container(
               margin: EdgeInsets.only(left: 50),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
-                color: Theme.of(context).buttonColor,
+                color: Theme
+                    .of(context)
+                    .buttonColor,
               ),
               height: 50,
               constraints: BoxConstraints(minWidth: 80, maxWidth: 120),
               child: Center(
                 child: Text(
-                  totalCost(),
-                  style: Theme.of(context).textTheme.button,
+                  '${bloc.totalCost()} đ',
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .button,
                 ),
               ),
             ),
@@ -296,7 +284,7 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
   }
 
   totalCost() {
-    return (widget.product.cost * quantity).toString() + " đ";
+    return (widget.product.cost * bloc.state.quantity).toString() + " đ";
   }
 
   Widget buildChooseSize(
@@ -308,10 +296,9 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 17),
       child: InkWell(
         onTap: () {
-          setState(() {
-            selectedIndex == index;
-            print(index);
-          });
+          bloc.state.selectedSizeIndex = index;
+          Size size = chooseSize(index);
+          bloc.chooseSize(size);
         },
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -321,8 +308,11 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
               height: 20,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.grey, width: 2.5),
-                color: selectedIndex == index
+                border: Border.all(
+                    color: Theme
+                        .of(context)
+                        .primaryColor, width: 2.5),
+                color: bloc.state.selectedSizeIndex == index
                     ? MyColors.yellowOrange
                     : Colors.transparent,
               ),
@@ -338,6 +328,77 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
               padding: const EdgeInsets.only(left: 160),
               child: Text(cost,
                   style: TextStyle(fontWeight: FontWeight.w400, fontSize: 15)),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Size chooseSize(int index) {
+    switch (index) {
+      case 0:
+        return Size.LARGE;
+      case 1:
+        return Size.MEDIUM;
+      case 2:
+        return Size.SMALL;
+    }
+    return Size.SMALL;
+  }
+
+  Widget buildChooseTopping({
+    int index,
+    String title,
+    String cost,
+    bool isActive = false,
+  }) {
+    return InkWell(
+      onTap: () {
+        Topping topping;
+        bloc.state.isActive = !bloc.state.isActive;
+        print(bloc.state.isActive);
+        if (bloc.state.isActive == true) {
+          topping = Topping.TRANCHAUTRANG;
+        }
+        bloc.chooseTopping(topping);
+      },
+      child: Container(
+        padding: EdgeInsets.only(left: 20),
+        height: 70,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.only(left: 20),
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                border: Border.all(
+                    color: Theme
+                        .of(context)
+                        .primaryColor, width: 2.5),
+                color: (bloc.state.isActive == true)
+                    ? MyColors.yellowOrange
+                    : Colors.transparent,
+              ),
+            ),
+            SizedBox(
+              width: 15,
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(title),
+                Text(
+                  cost,
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .subtitle2,
+                ),
+              ],
             )
           ],
         ),

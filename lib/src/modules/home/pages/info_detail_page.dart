@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutterclonethecoffeehouse/src/modules/dashboard/bloc/dashboard_bloc.dart';
+import 'package:flutterclonethecoffeehouse/src/modules/dashboard/bloc/dashboard_state.dart';
 import 'package:flutterclonethecoffeehouse/src/modules/home/model/item_card.dart';
-import 'package:flutterclonethecoffeehouse/src/modules/order/pages/order_page.dart';
 
 class InfoDetailPage extends StatefulWidget {
   final ItemCard itemCard;
@@ -86,10 +88,8 @@ class _InfoDetailPageState extends State<InfoDetailPage> {
                     visible: _isVisible,
                     child: InkWell(
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CatalogPage()));
+                        BlocProvider.of<DashBoardBloc>(context)
+                            .changePage(DashBoardTypes.ORDER);
                       },
                       child: Center(
                         child: Container(

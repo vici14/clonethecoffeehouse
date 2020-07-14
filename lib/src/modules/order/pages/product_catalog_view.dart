@@ -54,8 +54,6 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
                       crossAxisCount: 2),
                   itemBuilder: (BuildContext context, int index) {
                     var product = state.products[index];
-                    print('BBB ${product.id}');
-                    print("AAA${product.name}");
                     return GestureDetector(
                       onTap: () {
                         showGeneralDialog(

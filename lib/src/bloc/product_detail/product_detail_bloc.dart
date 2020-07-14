@@ -1,15 +1,25 @@
+import 'package:flutter/rendering.dart';
 import 'package:flutterclonethecoffeehouse/src/bloc/base/base_event.dart';
 import 'package:flutterclonethecoffeehouse/src/bloc/base/bloc_base.dart';
 import 'package:flutterclonethecoffeehouse/src/bloc/product_detail/product_detail_event.dart';
 import 'package:flutterclonethecoffeehouse/src/bloc/product_detail/product_detail_state.dart';
+import 'package:flutterclonethecoffeehouse/src/data/models/entities.dart';
 
 class ProductDetailBloc extends BlocBase<BaseEvent, ProductDetailState> {
+  final ProductEntity product;
   final Size size;
+  final Topping topping;
 
-  ProductDetailBloc({this.size});
+  ProductDetailBloc({this.product, this.size, this.topping});
 
   @override
-  ProductDetailState get initialState => ProductDetailState(quantity: 1);
+  ProductDetailState get initialState => ProductDetailState(
+      product: product,
+      isActive: false,
+      quantity: 1,
+      selectedSizeIndex: -1,
+      sizeCost: 0,
+      toppingCost: 0);
 
   @override
   Stream<ProductDetailState> mapEventToState(BaseEvent event) async* {
@@ -26,62 +36,75 @@ class ProductDetailBloc extends BlocBase<BaseEvent, ProductDetailState> {
 
   Stream<ProductDetailState> _incrementQuantityProductState(
       IncrementQuantityProductEvent event) async* {
-    yield ProductDetailState(quantity: state.quantity);
-    incrementQuantity(state.quantity);
-    yield ProductDetailState(quantity: state.quantity);
+    var _quantity = state.quantity + 1;
+    yield ProductDetailState(
+      state: state,
+      quantity: _quantity,
+    );
   }
 
   Stream<ProductDetailState> _decrementQuantityProductState(
       DecrementQuantityProductEvent event) async* {
-    yield ProductDetailState(quantity: state.quantity);
-    decrementQuantity(state.quantity);
-    yield ProductDetailState(quantity: state.quantity);
+    var _quantity;
+    if (state.quantity > 1) {
+      _quantity = state.quantity - 1;
+    }
+    yield ProductDetailState(
+      state: state,
+      quantity: _quantity,
+    );
   }
 
   Stream<ProductDetailState> _chooseSizeProductState(
       ChooseSizeProductEvent event) async* {
-    yield ProductDetailState();
-
-    yield ProductDetailState();
+    yield ProductDetailState(state: state, sizeCost: event.sizeCost);
   }
 
   Stream<ProductDetailState> _chooseToppingProductState(
       ChooseToppingProductEvent event) async* {
-    yield ProductDetailState();
-
-    /// do service
-    yield ProductDetailState();
+    yield ProductDetailState(state: state, toppingCost: event.toppingCost);
   }
 
-  incrementQuantity(int currentQuantity) {
-    return currentQuantity++;
+  incrementQuantity() {
+    add(IncrementQuantityProductEvent());
   }
 
-  decrementQuantity(int currentQuantity) {
-    if (currentQuantity > 1) {
-      currentQuantity--;
-    }
+  decrementQuantity() {
+    add(DecrementQuantityProductEvent());
   }
 
-  chooseSize(int sizeCost) {
+  int _chooseSize(Size size) {
     switch (size) {
       case Size.LARGE:
-        sizeCost = 10000;
-        state.isActive = true;
-        break;
+        return state.sizeCost = 10000;
       case Size.MEDIUM:
-        sizeCost = 5000;
-        break;
+        return state.sizeCost = 5000;
       case Size.SMALL:
-        sizeCost = 0;
-        break;
+        return state.sizeCost = 0;
     }
-    return sizeCost;
+    return state.sizeCost;
   }
 
-  chooseTopping(int toppingCost) {}
+  chooseSize(Size size) {
+    add(ChooseSizeProductEvent(sizeCost: _chooseSize(size)));
+  }
 
-  totalCost(int sizeCost, int toppingCost, int quantity, productCost) {
-    return (productCost * quantity) + sizeCost + toppingCost;
+  int _chooseTopping(Topping topping) {
+    switch (topping) {
+      case Topping.TRANCHAUTRANG:
+        return state.toppingCost = 10000;
+      case Topping.NONE:
+        return state.toppingCost = 0;
+    }
+    return state.toppingCost;
+  }
+
+  chooseTopping(Topping topping) {
+    add(ChooseToppingProductEvent(toppingCost: _chooseTopping(topping)));
+  }
+
+  totalCost() {
+    return (state.product.cost + state.sizeCost + state.toppingCost) *
+        state.quantity;
   }
 }

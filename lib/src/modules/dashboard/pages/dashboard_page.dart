@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutterclonethecoffeehouse/src/modules/dashboard/bloc/dashboard_bloc.dart';
+import 'package:flutterclonethecoffeehouse/src/modules/dashboard/bloc/dashboard_state.dart';
 import 'package:flutterclonethecoffeehouse/src/modules/home/pages/home_page.dart';
 import 'package:flutterclonethecoffeehouse/src/modules/map/pages/google_map_page.dart';
 import 'package:flutterclonethecoffeehouse/src/modules/myprofile/my_profile_page.dart';
@@ -48,13 +51,25 @@ class _DashBoardPageState extends State<DashBoardPage> {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoTabScaffold(
-      resizeToAvoidBottomInset: true,
-      controller: _tabController,
-      tabBuilder: (BuildContext context, int index) {
-        return listTab[index];
+    return BlocBuilder(
+      bloc: BlocProvider.of<DashBoardBloc>(context),
+      builder: (BuildContext context, DashBoardState state) {
+        if (state.isLoading == true) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        if (state.currentIndex != null && state.currentIndex < listTab.length)
+          _tabController.index = state.currentIndex;
+        return CupertinoTabScaffold(
+          resizeToAvoidBottomInset: true,
+          controller: _tabController,
+          tabBuilder: (BuildContext context, int index) {
+            return listTab[_tabController.index];
+          },
+          tabBar: _buildBottomBar(),
+        );
       },
-      tabBar: _buildBottomBar(),
     );
   }
 

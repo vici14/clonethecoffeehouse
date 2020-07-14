@@ -13,25 +13,25 @@ class CatalogState extends BaseState {
             isLoading: isLoading ?? state?.isLoading,
             timeStamp: DateTime.now().millisecondsSinceEpoch);
 }
-
-class DrinksCatalogState extends BaseState {
-  final List<ProductEntity> drinks;
-
-  DrinksCatalogState(
-      {List<ProductEntity> products, DrinksCatalogState state, bool isLoading})
-      : drinks = products ?? state?.drinks,
-        super(
-            isLoading: isLoading ?? state?.isLoading,
-            timeStamp: DateTime.now().millisecondsSinceEpoch);
-}
-
-class CakesCatalogState extends BaseState {
-  final List<ProductEntity> cakes;
-
-  CakesCatalogState(
-      {List<ProductEntity> products, CakesCatalogState state, bool isLoading})
-      : cakes = products ?? state?.cakes,
-        super(
-            isLoading: isLoading ?? state?.isLoading,
-            timeStamp: DateTime.now().millisecondsSinceEpoch);
-}
+//
+//class DrinksCatalogState extends BaseState {
+//  final List<ProductEntity> drinks;
+//
+//  DrinksCatalogState(
+//      {List<ProductEntity> products, DrinksCatalogState state, bool isLoading})
+//      : drinks = products ?? state?.drinks,
+//        super(
+//            isLoading: isLoading ?? state?.isLoading,
+//            timeStamp: DateTime.now().millisecondsSinceEpoch);
+//}
+//
+//class CakesCatalogState extends BaseState {
+//  final List<ProductEntity> cakes;
+//
+//  CakesCatalogState(
+//      {List<ProductEntity> products, CakesCatalogState state, bool isLoading})
+//      : cakes = products ?? state?.cakes,
+//        super(
+//            isLoading: isLoading ?? state?.isLoading,
+//            timeStamp: DateTime.now().millisecondsSinceEpoch);
+//}

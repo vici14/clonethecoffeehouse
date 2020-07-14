@@ -1,15 +1,25 @@
 import 'package:flutterclonethecoffeehouse/src/bloc/base/base_event.dart';
 
-class ChooseSizeProductEvent extends BaseEvent {}
+class ChooseSizeProductEvent extends BaseEvent {
+  final int sizeCost;
 
-class ChooseToppingProductEvent extends BaseEvent {}
-
-class IncrementQuantityProductEvent extends BaseEvent {
-//  final List<ProductRepository> products;
-//
-//  IncrementQuantityProductEvent(this.products);
-//
-//  List<Object> get props => [products];
+  ChooseSizeProductEvent({this.sizeCost});
 }
 
-class DecrementQuantityProductEvent extends BaseEvent {}
+class ChooseToppingProductEvent extends BaseEvent {
+  final int toppingCost;
+
+  ChooseToppingProductEvent({this.toppingCost});
+}
+
+class IncrementQuantityProductEvent extends BaseEvent {
+  final int quantity;
+
+  IncrementQuantityProductEvent({this.quantity});
+}
+
+class DecrementQuantityProductEvent extends BaseEvent {
+  final int quantity;
+
+  DecrementQuantityProductEvent({this.quantity});
+}

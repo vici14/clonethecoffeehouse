@@ -7,7 +7,6 @@ abstract class BaseCatalogViewStateState<Sf extends StatefulWidget>
   CatalogBloc bloc;
   BaseCatalogViewStateState({CatalogTypes type}) {
     bloc = CatalogBloc(type: type);
-//    bloc.getData();
   }
 
   @override

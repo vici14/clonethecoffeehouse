@@ -7,7 +7,6 @@ class ProductEntity {
   final int cost;
   final String imgUrl;
   final String category;
-  Size size;
 
   String get priceValue => '${cost} đ';
 
@@ -32,10 +31,10 @@ class ProductEntity {
   }
 }
 
-class Size {
-  final String small;
-  final String medium;
-  final String large;
-
-  Size({this.small, this.medium, this.large});
-}
+//class Size {
+//  final String small;
+//  final String medium;
+//  final String large;
+//
+//  Size({this.small, this.medium, this.large});
+//}
