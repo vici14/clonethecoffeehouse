@@ -5,22 +5,24 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutterclonethecoffeehouse/src/bloc/product_detail/product_detail_bloc.dart';
 import 'package:flutterclonethecoffeehouse/src/bloc/product_detail/product_detail_state.dart';
 import 'package:flutterclonethecoffeehouse/src/data/models/entities.dart';
+import 'package:flutterclonethecoffeehouse/src/modules/cart/bloc/cart_bloc.dart';
 import 'package:flutterclonethecoffeehouse/src/theme/my_colors.dart';
 
 class ProductDetailDialog extends StatefulWidget {
   final ProductEntity product;
-  final Size size;
 
-  const ProductDetailDialog({Key key, this.product, this.size})
-      : super(key: key);
+  const ProductDetailDialog({Key key, this.product}) : super(key: key);
 
   @override
-  _ProductDetailDialogState createState() =>
-      _ProductDetailDialogState(product: product);
+  _ProductDetailDialogState createState() => _ProductDetailDialogState(
+        product: product,
+      );
 }
 
 class _ProductDetailDialogState extends State<ProductDetailDialog> {
   ProductDetailBloc bloc;
+  Size inSize = Size.SMALL;
+  Topping inTopping = Topping.NONE;
 
   _ProductDetailDialogState({ProductEntity product}) {
     bloc = ProductDetailBloc(product: product);
@@ -28,6 +30,8 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
 
   int selectedIndex = -1;
   bool isActive = false;
+
+  CartBloc get _cartBloc => BlocProvider.of<CartBloc>(context);
 
   @override
   void initState() {
@@ -45,17 +49,11 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
           );
         }
         return Dialog(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8.0))),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
           child: Container(
-            constraints:
-                BoxConstraints(minHeight: 500, maxHeight: 600, maxWidth: 350),
+            constraints: BoxConstraints(minHeight: 500, maxHeight: 600, maxWidth: 350),
             child: Column(
-              children: <Widget>[
-                buildHeader(context),
-                buildBody(context),
-                buildFooter(context)
-              ],
+              children: <Widget>[buildHeader(context), buildBody(context), buildFooter(context)],
             ),
           ),
         );
@@ -85,11 +83,12 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
                 children: <Widget>[
                   Text(
                     widget.product.name,
-                    style: Theme.of(context).textTheme.body1,
+                    style: Theme
+                        .of(context)
+                        .textTheme
+                        .body1,
                   ),
-                  Text(widget.product.cost.toString(),
-                      style:
-                          TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                  Text(widget.product.cost.toString(), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
                   SizedBox(
                     height: 10,
                   ),
@@ -140,7 +139,8 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
                 margin: EdgeInsets.all(8),
                 child: Text(
                   "Size",
-                  style: Theme.of(context)
+                  style: Theme
+                      .of(context)
                       .textTheme
                       .title
                       .copyWith(fontWeight: FontWeight.w400),
@@ -173,31 +173,28 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
               padding: EdgeInsets.symmetric(horizontal: 15),
               child: Container(
                 margin: EdgeInsets.all(8),
-                child: Text("Topping",
-                    style: Theme.of(context)
-                        .textTheme
-                        .title
-                        .copyWith(fontWeight: FontWeight.w400)),
+                child: Text("Topping", style: Theme
+                    .of(context)
+                    .textTheme
+                    .title
+                    .copyWith(fontWeight: FontWeight.w400)),
               ),
               color: Colors.grey.withOpacity(0.3),
             ),
             Container(
               child: Column(
-                children: <Widget>[
-                  buildChooseTopping(
-                      index: 0, title: "Trân châu trắng", cost: '10000 đ')
-                ],
+                children: <Widget>[buildChooseTopping(index: 0, title: "Trân châu trắng", cost: '10000 đ')],
               ),
             ),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 15),
               child: Container(
                 margin: EdgeInsets.all(8),
-                child: Text("Giới thiệu món",
-                    style: Theme.of(context)
-                        .textTheme
-                        .title
-                        .copyWith(fontWeight: FontWeight.w400)),
+                child: Text("Giới thiệu món", style: Theme
+                    .of(context)
+                    .textTheme
+                    .title
+                    .copyWith(fontWeight: FontWeight.w400)),
               ),
               color: Colors.grey.withOpacity(0.3),
             ),
@@ -226,9 +223,7 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
                   iconSize: 30,
                   icon: Icon(
                     Icons.remove_circle,
-                    color: (bloc.state.quantity > 1 == true)
-                        ? MyColors.red
-                        : MyColors.grey,
+                    color: (bloc.state.quantity > 1 == true) ? MyColors.red : MyColors.grey,
                   ),
                   onPressed: () {
                     bloc.decrementQuantity();
@@ -252,11 +247,19 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
               ),
             ],
           ),
-//          SizedBox(
-//            width: 60,
-//          ),
           InkWell(
-            onTap: () {},
+            onTap: () {
+              _cartBloc?.addProduct(
+                product: bloc.state.product,
+                cost: bloc.totalCost(),
+                quantity: bloc.state.quantity,
+                size: inSize,
+                topping: inTopping,
+              );
+              print('aaaa${_cartBloc?.addProduct}');
+
+              Navigator.of(context).pop();
+            },
             child: Container(
               margin: EdgeInsets.only(left: 50),
               decoration: BoxDecoration(
@@ -299,6 +302,7 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
           bloc.state.selectedSizeIndex = index;
           Size size = chooseSize(index);
           bloc.chooseSize(size);
+          inSize = size;
         },
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -308,13 +312,10 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
               height: 20,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(
-                    color: Theme
-                        .of(context)
-                        .primaryColor, width: 2.5),
-                color: bloc.state.selectedSizeIndex == index
-                    ? MyColors.yellowOrange
-                    : Colors.transparent,
+                border: Border.all(color: Theme
+                    .of(context)
+                    .primaryColor, width: 2.5),
+                color: bloc.state.selectedSizeIndex == index ? MyColors.yellowOrange : Colors.transparent,
               ),
             ),
             SizedBox(
@@ -326,8 +327,7 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
             ),
             Padding(
               padding: const EdgeInsets.only(left: 160),
-              child: Text(cost,
-                  style: TextStyle(fontWeight: FontWeight.w400, fontSize: 15)),
+              child: Text(cost, style: TextStyle(fontWeight: FontWeight.w400, fontSize: 15)),
             )
           ],
         ),
@@ -360,8 +360,11 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
         print(bloc.state.isActive);
         if (bloc.state.isActive == true) {
           topping = Topping.TRANCHAUTRANG;
+        } else {
+          topping = Topping.NONE;
         }
         bloc.chooseTopping(topping);
+        inTopping = topping;
       },
       child: Container(
         padding: EdgeInsets.only(left: 20),
@@ -374,13 +377,10 @@ class _ProductDetailDialogState extends State<ProductDetailDialog> {
               width: 20,
               height: 20,
               decoration: BoxDecoration(
-                border: Border.all(
-                    color: Theme
-                        .of(context)
-                        .primaryColor, width: 2.5),
-                color: (bloc.state.isActive == true)
-                    ? MyColors.yellowOrange
-                    : Colors.transparent,
+                border: Border.all(color: Theme
+                    .of(context)
+                    .primaryColor, width: 2.5),
+                color: (bloc.state.isActive == true) ? MyColors.yellowOrange : Colors.transparent,
               ),
             ),
             SizedBox(

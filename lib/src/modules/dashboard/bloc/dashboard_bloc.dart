@@ -7,11 +7,10 @@ class DashBoardBloc extends BlocBase<BaseEvent, DashBoardState> {
   int currentIndex = 0;
   final DashBoardTypes type;
 
-  DashBoardBloc(this.type);
+  DashBoardBloc({this.type});
 
   @override
-  DashBoardState get initialState =>
-      DashBoardState(isLoading: false, currentIndex: 0);
+  DashBoardState get initialState => DashBoardState(isLoading: false, currentIndex: 0);
 
   @override
   Stream<DashBoardState> mapEventToState(BaseEvent event) async* {

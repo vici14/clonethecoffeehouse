@@ -1,5 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutterclonethecoffeehouse/src/bloc/product_detail/product_detail_state.dart';
+import 'package:flutterclonethecoffeehouse/src/domain/entities/cart_entity.dart';
+import 'package:flutterclonethecoffeehouse/src/modules/cart/bloc/cart_bloc.dart';
+import 'package:flutterclonethecoffeehouse/src/modules/cart/bloc/cart_state.dart';
 import 'package:flutterclonethecoffeehouse/src/utils/uidata.dart';
 
 class CartPage extends StatefulWidget {
@@ -10,6 +15,21 @@ class CartPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<CartPage> {
+  CartBloc get bloc => BlocProvider.of<CartBloc>(context);
+
+  CartState get state => bloc?.state;
+
+  List<CartItemEntity> get listItems => state?.cart?.listCartItem;
+
+  CartItemEntity cartItem(int index) {
+    if (listItems != null && listItems.length > index) {
+      return listItems[index];
+    }
+    return null;
+  }
+
+  int get listLength => listItems?.length ?? 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,48 +38,76 @@ class _CartPageState extends State<CartPage> {
         title: Text("Giỏ hàng của bạn"),
       ),
       body: SafeArea(
-        child: Container(
-          child: Column(
-            children: <Widget>[
-              Expanded(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  physics: AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Text("Nhận tại cửa hàng (Pick-up)"),
-                      ),
-                      _buildPickInfo(),
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Text("Thời gian nhận nước tại cửa hàng"),
-                      ),
-                      _buildChooseTime(),
-                      Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Text("Chi tiết đơn hàng"),
-                      ),
-                      _buildDetailCart(context),
-                      _buildReceipt(),
-                    ],
+          child: BlocBuilder(
+        bloc: bloc,
+        builder: (BuildContext context, CartState state) {
+          if (state?.cart?.listCartItem?.isEmpty == true) {
+            return Center(
+                child: Text(
+              "Empty...",
+              style: Theme.of(context).textTheme.subtitle1,
+            ));
+          }
+          return Container(
+            height: MediaQuery.of(context).size.height,
+            child: Column(
+              children: <Widget>[
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    physics: AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Text("Nhận tại cửa hàng (Pick-up)"),
+                        ),
+                        _buildPickInfo(),
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Text("Thời gian nhận nước tại cửa hàng"),
+                        ),
+                        _buildChooseTime(),
+                        Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Text("Chi tiết đơn hàng"),
+                        ),
+                        _buildDetailCart(context),
+                        _buildReceipt(),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              _buildFooter(),
-            ],
-          ),
-        ),
-      ),
+                _buildFooter(),
+              ],
+            ),
+          );
+        },
+      )),
     );
   }
 
-  Widget _buildProductRow({int quantity, String title, String size, int cost}) {
+  Widget _buildProductRow(CartItemEntity item) {
+    String size = "";
+
+    switch (item?.size) {
+      case Size.LARGE:
+        size = "Lớn";
+        break;
+      case Size.SMALL:
+        size = "Nhỏ";
+        break;
+      case Size.MEDIUM:
+        size = "Vừa";
+        break;
+      default:
+        size = "Nhỏ";
+    }
+
     return Container(
       width: double.infinity,
-      height: 100,
+      height: 122,
       child: Stack(
         children: <Widget>[
           Row(
@@ -72,28 +120,38 @@ class _CartPageState extends State<CartPage> {
                   decoration: BoxDecoration(border: Border.all()),
                   child: Center(
                       child: Text(
-                    quantity.toString(),
-                    style: TextStyle(color: Theme.of(context).primaryColor),
-                  )),
+                        item.quantity.toString(),
+                        style: TextStyle(color: Theme
+                            .of(context)
+                            .primaryColor),
+                      )),
                 ),
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(title),
-                  Text(size, style: Theme.of(context).textTheme.subtitle2),
+                  Text(item?.product?.name),
+                  Text(size, style: Theme
+                      .of(context)
+                      .textTheme
+                      .subtitle2),
+                  (item.topping == Topping.NONE)
+                      ? SizedBox()
+                      : Text(
+                    "Trân châu Trắng",
+                    style: Theme
+                        .of(context)
+                        .textTheme
+                        .subtitle2,
+                  ),
                   Container(
                     height: 59,
                     width: 250,
                     child: TextField(
-                        style: TextStyle(
-                            fontSize: 13, color: Colors.grey.withOpacity(0.8)),
+                        style: TextStyle(fontSize: 13, color: Colors.grey.withOpacity(0.8)),
                         textInputAction: TextInputAction.done,
                         maxLines: 2,
-                        decoration: InputDecoration(
-                            hintText: "Bạn muốn dặn dò gì không?",
-                            hintStyle: TextStyle(fontSize: 13),
-                            icon: Icon(Icons.event_note))),
+                        decoration: InputDecoration(hintText: "Bạn muốn dặn dò gì không?", hintStyle: TextStyle(fontSize: 13), icon: Icon(Icons.event_note))),
                   ),
                 ],
               ),
@@ -102,7 +160,7 @@ class _CartPageState extends State<CartPage> {
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: Text(
-                    '${cost.toString()} đ',
+                    '${item.cost} đ',
                     textAlign: TextAlign.end,
                   ),
                 ),
@@ -147,8 +205,9 @@ class _CartPageState extends State<CartPage> {
                       InkWell(
                         child: Text(
                           "THAY ĐỔI",
-                          style:
-                              TextStyle(color: Theme.of(context).primaryColor),
+                          style: TextStyle(color: Theme
+                              .of(context)
+                              .primaryColor),
                         ),
                       )
                     ],
@@ -187,30 +246,20 @@ class _CartPageState extends State<CartPage> {
   Widget _buildDetailCart(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-      color: Theme.of(context).canvasColor,
-      child: Column(
-        children: <Widget>[
-          _buildProductRow(
-              quantity: 1,
-              title: "Điều vàng rang muối",
-              size: "Nhỏ",
-              cost: 20000),
-          _buildProductRow(
-              quantity: 3,
-              title: "Chocolate Đá Xay",
-              size: "Vừa",
-              cost: 177000),
-          _buildProductRow(
-              quantity: 2,
-              title: "Trà Oolong Hoa Atiso Đỏ",
-              cost: 60000,
-              size: "Lớn"),
-          _buildProductRow(
-              quantity: 5,
-              title: "Caramel Macchiato Đá",
-              cost: 50000,
-              size: "Nhỏ"),
-        ],
+      color: Theme
+          .of(context)
+          .canvasColor,
+      child: ListView.builder(
+        shrinkWrap: true,
+        scrollDirection: Axis.vertical,
+        itemCount: listLength,
+        itemBuilder: (BuildContext context, int index) {
+          var item = cartItem(index);
+          if (item != null) {
+            return _buildProductRow(item);
+          }
+          return Text("Empty...");
+        },
       ),
     );
   }
@@ -234,7 +283,7 @@ class _CartPageState extends State<CartPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Text("Tạm tính"),
-                Text("307.000đ"),
+                Text("${state.totalCost} đ" ?? "0"),
               ],
             ),
           ),
@@ -264,11 +313,11 @@ class _CartPageState extends State<CartPage> {
               InkWell(
                 onTap: () {},
                 child: Container(
-                  width: MediaQuery.of(context).size.width / 2,
-                  decoration: BoxDecoration(
-                      border: Border(
-                          right: BorderSide(
-                              width: 1, color: Colors.grey.withOpacity(0.5)))),
+                  width: MediaQuery
+                      .of(context)
+                      .size
+                      .width / 2,
+                  decoration: BoxDecoration(border: Border(right: BorderSide(width: 1, color: Colors.grey.withOpacity(0.5)))),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10.0),
                     child: Center(
@@ -276,7 +325,9 @@ class _CartPageState extends State<CartPage> {
                         children: <Widget>[
                           Image.asset(UIData.icVisa),
                           Text("Visa/Master/JCB"),
-                          Text("307.000 đ")
+                          Text(
+                            "${state?.totalCost} đ" ?? "0",
+                          ),
                         ],
                       ),
                     ),
@@ -325,7 +376,7 @@ class _CartPageState extends State<CartPage> {
                   Padding(
                     padding: const EdgeInsets.only(left: 15.0),
                     child: Text(
-                      "307.000 đ",
+                      "${state?.totalCost} đ" ?? "0",
                       style: TextStyle(color: Colors.white),
                     ),
                   ),

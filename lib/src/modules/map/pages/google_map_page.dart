@@ -142,8 +142,7 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
     );
   }
 
-  List<DistanceMarker> findFiveClosestStore(CameraPosition lastLocation,
-      List<Marker> markers) {
+  List<DistanceMarker> findFiveClosestStore(CameraPosition lastLocation, List<Marker> markers) {
     List<DistanceMarker> list = [];
     var cameraLat = lastLocation?.target?.latitude;
     var cameraLong = lastLocation?.target?.longitude;
@@ -154,17 +153,12 @@ class _GoogleMapPageState extends State<GoogleMapPage> {
       var markerLong = markers[i]?.position?.longitude;
       var distanceLat = rad(markerLat - cameraLat);
       var distanceLong = rad(markerLong - cameraLong);
-      var a = Math.sin(distanceLat / 2) * Math.sin(distanceLat / 2) +
-          Math.cos(rad(cameraLat)) *
-              Math.cos(rad(cameraLat)) *
-              Math.sin(distanceLong / 2) *
-              Math.sin(distanceLong / 2);
+      var a = Math.sin(distanceLat / 2) * Math.sin(distanceLat / 2) + Math.cos(rad(cameraLat)) * Math.cos(rad(cameraLat)) * Math.sin(distanceLong / 2) * Math.sin(distanceLong / 2);
       var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       var d = R * c;
       distances.add(d);
 
-      DistanceMarker resultMarker =
-      DistanceMarker(markers[i].markerId, distances[i]);
+      DistanceMarker resultMarker = DistanceMarker(markers[i].markerId, distances[i]);
 
       list.add(resultMarker);
     }

@@ -23,3 +23,5 @@ class DecrementQuantityProductEvent extends BaseEvent {
 
   DecrementQuantityProductEvent({this.quantity});
 }
+
+class AddProductToCartEvent extends BaseEvent {}

@@ -10,16 +10,22 @@ class ProductDetailBloc extends BlocBase<BaseEvent, ProductDetailState> {
   final Size size;
   final Topping topping;
 
-  ProductDetailBloc({this.product, this.size, this.topping});
+  ProductDetailBloc({
+    this.product,
+    this.size,
+    this.topping,
+  });
 
   @override
   ProductDetailState get initialState => ProductDetailState(
-      product: product,
-      isActive: false,
-      quantity: 1,
-      selectedSizeIndex: -1,
-      sizeCost: 0,
-      toppingCost: 0);
+        product: product,
+        isActive: false,
+        quantity: 1,
+        selectedSizeIndex: -1,
+        sizeCost: 0,
+        toppingCost: 0,
+        state: state,
+      );
 
   @override
   Stream<ProductDetailState> mapEventToState(BaseEvent event) async* {
@@ -34,8 +40,7 @@ class ProductDetailBloc extends BlocBase<BaseEvent, ProductDetailState> {
     }
   }
 
-  Stream<ProductDetailState> _incrementQuantityProductState(
-      IncrementQuantityProductEvent event) async* {
+  Stream<ProductDetailState> _incrementQuantityProductState(IncrementQuantityProductEvent event) async* {
     var _quantity = state.quantity + 1;
     yield ProductDetailState(
       state: state,
@@ -43,8 +48,7 @@ class ProductDetailBloc extends BlocBase<BaseEvent, ProductDetailState> {
     );
   }
 
-  Stream<ProductDetailState> _decrementQuantityProductState(
-      DecrementQuantityProductEvent event) async* {
+  Stream<ProductDetailState> _decrementQuantityProductState(DecrementQuantityProductEvent event) async* {
     var _quantity;
     if (state.quantity > 1) {
       _quantity = state.quantity - 1;
@@ -55,13 +59,11 @@ class ProductDetailBloc extends BlocBase<BaseEvent, ProductDetailState> {
     );
   }
 
-  Stream<ProductDetailState> _chooseSizeProductState(
-      ChooseSizeProductEvent event) async* {
+  Stream<ProductDetailState> _chooseSizeProductState(ChooseSizeProductEvent event) async* {
     yield ProductDetailState(state: state, sizeCost: event.sizeCost);
   }
 
-  Stream<ProductDetailState> _chooseToppingProductState(
-      ChooseToppingProductEvent event) async* {
+  Stream<ProductDetailState> _chooseToppingProductState(ChooseToppingProductEvent event) async* {
     yield ProductDetailState(state: state, toppingCost: event.toppingCost);
   }
 
@@ -104,7 +106,6 @@ class ProductDetailBloc extends BlocBase<BaseEvent, ProductDetailState> {
   }
 
   totalCost() {
-    return (state.product.cost + state.sizeCost + state.toppingCost) *
-        state.quantity;
+    return (state.product.cost + state.sizeCost + state.toppingCost) * state.quantity;
   }
 }

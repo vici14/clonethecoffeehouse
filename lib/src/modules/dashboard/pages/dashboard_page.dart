@@ -59,8 +59,7 @@ class _DashBoardPageState extends State<DashBoardPage> {
             child: CircularProgressIndicator(),
           );
         }
-        if (state.currentIndex != null && state.currentIndex < listTab.length)
-          _tabController.index = state.currentIndex;
+        if (state.currentIndex != null && state.currentIndex < listTab.length) _tabController.index = state.currentIndex;
         return CupertinoTabScaffold(
           resizeToAvoidBottomInset: true,
           controller: _tabController,
